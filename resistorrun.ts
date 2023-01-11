@@ -3,19 +3,26 @@ class Resistor {
     constructor(r: number) {
         this.r = r;
     }
-    getCurrent(u: number): number {
-        return u / this.r;
-    }
-}
-let resistors: Resistor[] = [];
-let r1: Resistor = new Resistor(220);
-let r2: Resistor = new Resistor(4700);
-let r3: Resistor = new Resistor(110);
-resistors.push(r1)
-resistors.push(r2)
-resistors.push(r3)
-console.log(resistors)
 
-let totalCurrent: number = 0;
-resistors.forEach((resistor) => { totalCurrent += resistor.getCurrent(5); });
-console.log(totalCurrent);
+    getPower(u: number): number {
+        return u * this.r;
+    }
+    getAmps(w:number, v:number): number{
+        return w / v
+    }
+    getOhms(w:number, v:number):number{
+        return v / this.getAmps(w, v)
+    }
+    getTemp(w:number, ml:number):number{
+        return Math.floor(20+(60/(4.19*(ml/w))))
+    }
+
+}
+
+let r1 = new Resistor(2);
+console.log(r1.getPower(5));
+console.log(r1.getAmps(6,4));
+console.log(r1.getOhms(6,4));
+console.log(r1.getTemp(1000, 1000));
+console.log(r1.getAmps(1000, 220));
+console.log(r1.getOhms(1000, 220));
