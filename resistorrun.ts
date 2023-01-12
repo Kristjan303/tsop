@@ -1,28 +1,41 @@
 class Resistor {
     r: number = 0;
-    constructor(r: number) {
+    maxPower: number = 0;
+    maxVoltage: number = 0;
+
+    constructor(r: number, maxPower: number, maxVoltage: number) {
         this.r = r;
+        this.maxPower = maxPower;
+        this.maxVoltage = maxVoltage;
     }
-
+    getCurrent(u: number): number {
+        return u / this.r;
+    }
     getPower(u: number): number {
-        return u * this.r;
+        return u * this.getCurrent(u);
     }
-    getAmps(w:number, v:number): number{
-        return w / v
+    getMaxPower(): number {
+        return this.maxPower;
     }
-    getOhms(w:number, v:number):number{
-        return v / this.getAmps(w, v)
+    isVoltageAllowed(u: number): boolean {
+        return u <= this.maxVoltage;
     }
-    getTemp(w:number, ml:number):number{
-        return Math.floor(20+(60/(4.19*(ml/w))))
-    }
-
 }
+let r1 = new Resistor(220, 100, 20);
 
-let r1 = new Resistor(2);
-console.log(r1.getPower(5));
-console.log(r1.getAmps(6,4));
-console.log(r1.getOhms(6,4));
-console.log(r1.getTemp(1000, 1000));
-console.log(r1.getAmps(1000, 220));
-console.log(r1.getOhms(1000, 220));
+
+console.log(r1.isVoltageAllowed(19)); // true
+console.log(r1.isVoltageAllowed(21)); // false
+
+const resistors: Resistor[] = [
+    new Resistor(220, 100, 10),
+    new Resistor(330, 200, 15),
+    new Resistor(100, 50, 5),
+    new Resistor(100, 70, 8)
+];
+
+function getAllowedResistor(voltage: number, resistors: Resistor[]): Resistor[] {
+    return resistors.filter(resistor => resistor.isVoltageAllowed(voltage));
+}
+let allowedResistor = getAllowedResistor(8, resistors); // vastus: 3, kuna üks on alla 8 volti
+console.log(allowedResistor)
