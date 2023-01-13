@@ -1,12 +1,7 @@
 class Resistor {
     r: number = 0;
-    maxPower: number = 0;
-    maxVoltage: number = 0;
-
-    constructor(r: number, maxPower: number, maxVoltage: number) {
+    constructor(r: number) {
         this.r = r;
-        this.maxPower = maxPower;
-        this.maxVoltage = maxVoltage;
     }
     getCurrent(u: number): number {
         return u / this.r;
@@ -14,28 +9,60 @@ class Resistor {
     getPower(u: number): number {
         return u * this.getCurrent(u);
     }
-    getMaxPower(): number {
-        return this.maxPower;
+    getResistance(): number {
+        return this.r;
     }
-    isVoltageAllowed(u: number): boolean {
-        return u <= this.maxVoltage;
+    getVoltage(i: number): number {
+        return i * this.r;
     }
 }
-let r1 = new Resistor(220, 100, 20);
 
 
-console.log(r1.isVoltageAllowed(19)); // true
-console.log(r1.isVoltageAllowed(21)); // false
-
-const resistors: Resistor[] = [
-    new Resistor(220, 100, 10),
-    new Resistor(330, 200, 15),
-    new Resistor(100, 50, 5),
-    new Resistor(100, 70, 8)
-];
-
-function getAllowedResistor(voltage: number, resistors: Resistor[]): Resistor[] {
-    return resistors.filter(resistor => resistor.isVoltageAllowed(voltage));
+class SeriesCircuit {
+    resistors: Resistor[] = []
+    push(r: Resistor) {
+        this.resistors.push(r);
+    }
+    getTotalResistance() {
+        let sum: number = 0;
+        this.resistors.forEach((r: Resistor) => { sum += r.getResistance() });
+        return sum;
+    }
+    getVoltagePerResistor(u: number) {
+        return u / this.resistors.length;
+    }
+    getCurrent(u: number) {
+        return u / this.getTotalResistance();
+    }
+    getPowerPerResistor(u: number) {
+        const voltagePerResistor = this.getVoltagePerResistor(u);
+        return voltagePerResistor * this.getCurrent(u);
+    }
 }
-let allowedResistor = getAllowedResistor(8, resistors); // vastus: 3, kuna üks on alla 8 volti
-console.log(allowedResistor)
+
+let sc1: SeriesCircuit = new SeriesCircuit();
+
+sc1.push(new Resistor(220));
+sc1.push(new Resistor(220));
+sc1.push(new Resistor(220));
+console.log(sc1.getTotalResistance());
+console.log(sc1.getVoltagePerResistor(12))
+console.log(sc1.getPowerPerResistor(12));
+console.log('*********************************************************************')
+
+
+let sc2: SeriesCircuit = new SeriesCircuit()
+
+sc2.push(new Resistor(110));
+sc2.push(new Resistor(220));
+sc2.push(new Resistor(220));
+
+console.log(sc2.getTotalResistance())
+console.log(sc2.getCurrent(12))
+console.log(sc2.resistors[0].getVoltage(sc2.getCurrent(12)))
+console.log(sc2.resistors[1].getVoltage(sc2.getCurrent(12)))
+console.log(sc2.resistors[2].getVoltage(sc2.getCurrent(12)))
+
+console.log(sc2.resistors[0].getPower(sc2.resistors[0].getVoltage(sc2.getCurrent(12))))
+console.log(sc2.resistors[1].getPower(sc2.resistors[1].getVoltage(sc2.getCurrent(12))))
+console.log(sc2.resistors[2].getPower(sc2.resistors[2].getVoltage(sc2.getCurrent(12))))
